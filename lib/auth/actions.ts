@@ -119,5 +119,16 @@ export async function getCurrentUserProfile(): Promise<UserProfile | null> {
     .maybeSingle();
 
   if (error || !data) return null;
-  return data as unknown as UserProfile;
+
+  // PostgREST devuelve el embed roles(...) como objeto (no array) para una
+  // relacion muchos-a-uno como rol_id -> roles.id. Normalizamos siempre a
+  // array para que el resto del codigo (ej. requireRole) no tenga que
+  // adivinar la forma.
+  const rolesRaw = (data as { roles: unknown }).roles as
+    | { codigo: string; descripcion: string | null }
+    | { codigo: string; descripcion: string | null }[]
+    | null;
+  const roles = Array.isArray(rolesRaw) ? rolesRaw : rolesRaw ? [rolesRaw] : [];
+
+  return { ...data, roles } as unknown as UserProfile;
 }
