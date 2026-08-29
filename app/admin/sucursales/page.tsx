@@ -1,8 +1,10 @@
+import { requireRole } from "@/lib/auth/guards";
 import { getSucursales } from "@/lib/sucursales/actions";
 import { NuevaSucursalForm } from "@/components/sucursales/nueva-sucursal-form";
 import { SucursalesTable } from "@/components/sucursales/sucursales-table";
 
 export default async function SucursalesPage() {
+  await requireRole(["administrador"]);
   const sucursales = await getSucursales();
 
   return (
