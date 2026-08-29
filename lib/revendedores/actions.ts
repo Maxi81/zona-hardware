@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserProfile } from "@/lib/auth/actions";
 import { revalidatePath } from "next/cache";
 
@@ -51,11 +52,18 @@ export async function solicitarAltaRevendedor(
   return { success: true };
 }
 
+// Usa el cliente con service role: la RLS de usuarios solo deja ver la
+// fila propia, y esta pantalla (solo para administrador, protegida por
+// requireRole en la pagina) necesita mostrar nombre/apellido de otros
+// usuarios. Se valida el rol antes de usarlo, igual que en usuarios-admin.
 export async function getSolicitudesPendientes(): Promise<
   SolicitudRevendedor[]
 > {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+  const profile = await getCurrentUserProfile();
+  if (profile?.roles?.[0]?.codigo !== "administrador") return [];
+
+  const admin = createAdminClient();
+  const { data, error } = await admin
     .from("solicitudes_revendedor")
     .select(
       "id, usuario_id, cuit, estado, motivo_rechazo, created_at, usuarios(nombre, apellido)",
