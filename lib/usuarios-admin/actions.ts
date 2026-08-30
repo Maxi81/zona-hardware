@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserProfile } from "@/lib/auth/actions";
 import { revalidatePath } from "next/cache";
+import { ROLES_INTERNOS, type RolInterno } from "@/lib/usuarios-admin/roles";
 
 export type UsuarioAdmin = {
   id: string;
@@ -86,26 +87,6 @@ export async function cambiarEstadoUsuario(
   revalidatePath("/admin/usuarios");
   return { success: true };
 }
-
-export const ROLES_LABELS: Record<string, string> = {
-  cliente: "Cliente",
-  revendedor: "Revendedor",
-  encargado_deposito: "Encargado de depósito",
-  vendedor: "Vendedor",
-  gerente: "Gerente",
-  administrador: "Administrador",
-};
-
-// Roles que el administrador puede asignar al crear un usuario interno nuevo
-// (HU-002). Cliente y revendedor no entran acá: se generan solos por registro
-// público (HU-001) o por la solicitud de revendedor (HU-003).
-export const ROLES_INTERNOS = [
-  "encargado_deposito",
-  "vendedor",
-  "gerente",
-] as const;
-
-export type RolInterno = (typeof ROLES_INTERNOS)[number];
 
 export type CrearUsuarioInternoResult = UsuarioAdminActionResult & {
   passwordTemporal?: string;

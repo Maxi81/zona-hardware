@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  crearUsuarioInterno,
-  ROLES_INTERNOS,
-  ROLES_LABELS,
-} from "@/lib/usuarios-admin/actions";
+import { crearUsuarioInterno } from "@/lib/usuarios-admin/actions";
+import { ROLES_INTERNOS, ROLES_LABELS } from "@/lib/usuarios-admin/roles";
 import { Button } from "@/components/ui/button";
 import {
   Card,

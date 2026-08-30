@@ -3,9 +3,9 @@
 import {
   cambiarEstadoUsuario,
   cambiarRolUsuario,
-  ROLES_LABELS,
   type UsuarioAdmin,
 } from "@/lib/usuarios-admin/actions";
+import { ROLES_LABELS } from "@/lib/usuarios-admin/roles";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
