@@ -25,7 +25,7 @@ export async function getMiSolicitudRevendedor(): Promise<SolicitudRevendedor | 
   const { data } = await supabase
     .from("solicitudes_revendedor")
     .select(
-      "id, usuario_id, cuit, estado, motivo_rechazo, created_at, usuarios(nombre, apellido)",
+      "id, usuario_id, cuit, estado, motivo_rechazo, created_at, usuarios!solicitudes_revendedor_usuario_id_fkey(nombre, apellido)",
     )
     .eq("usuario_id", profile.id)
     .order("created_at", { ascending: false })
@@ -66,7 +66,7 @@ export async function getSolicitudesPendientes(): Promise<
   const { data, error } = await admin
     .from("solicitudes_revendedor")
     .select(
-      "id, usuario_id, cuit, estado, motivo_rechazo, created_at, usuarios(nombre, apellido)",
+      "id, usuario_id, cuit, estado, motivo_rechazo, created_at, usuarios!solicitudes_revendedor_usuario_id_fkey(nombre, apellido)",
     )
     .eq("estado", "pendiente")
     .order("created_at");
