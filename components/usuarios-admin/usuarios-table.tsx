@@ -1,14 +1,24 @@
 "use client";
 
-import { cambiarEstadoUsuario, type UsuarioAdmin } from "@/lib/usuarios-admin/actions";
+import {
+  cambiarEstadoUsuario,
+  cambiarRolUsuario,
+  ROLES_LABELS,
+  type UsuarioAdmin,
+} from "@/lib/usuarios-admin/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { useState } from "react";
 
 export function UsuariosTable({ usuarios }: { usuarios: UsuarioAdmin[] }) {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [motivos, setMotivos] = useState<Record<string, string>>({});
+  const [rolesSeleccionados, setRolesSeleccionados] = useState<
+    Record<string, string>
+  >({});
+  const [pendingRolId, setPendingRolId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCambiarEstado = async (
@@ -29,6 +39,24 @@ export function UsuariosTable({ usuarios }: { usuarios: UsuarioAdmin[] }) {
     setPendingId(null);
   };
 
+  const handleCambiarRol = async (id: string, rolActual: string) => {
+    const rolElegido = rolesSeleccionados[id] ?? rolActual;
+    if (rolElegido === rolActual) return;
+    setPendingRolId(id);
+    setError(null);
+    const result = await cambiarRolUsuario(id, rolElegido);
+    if (result.error) setError(result.error);
+    setPendingRolId(null);
+  };
+
+  if (usuarios.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Todavía no hay usuarios cargados.
+      </p>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2">
       {error && <p className="text-sm text-red-500">{error}</p>}
@@ -45,39 +73,77 @@ export function UsuariosTable({ usuarios }: { usuarios: UsuarioAdmin[] }) {
             </tr>
           </thead>
           <tbody>
-            {usuarios.map((u) => (
-              <tr key={u.id} className="border-t align-top">
-                <td className="p-3 font-medium">
-                  {u.nombre} {u.apellido}
-                </td>
-                <td className="p-3 text-muted-foreground">{u.email ?? "—"}</td>
-                <td className="p-3">{u.roles?.[0]?.codigo ?? "—"}</td>
-                <td className="p-3">
-                  <Badge variant={u.estado === "activo" ? "default" : "secondary"}>
-                    {u.estado}
-                  </Badge>
-                </td>
-                <td className="p-3 w-64">
-                  <Input
-                    placeholder="Motivo"
-                    value={motivos[u.id] ?? ""}
-                    onChange={(e) =>
-                      setMotivos((m) => ({ ...m, [u.id]: e.target.value }))
-                    }
-                  />
-                </td>
-                <td className="p-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={pendingId === u.id}
-                    onClick={() => handleCambiarEstado(u.id, u.estado)}
-                  >
-                    {u.estado === "activo" ? "Desactivar" : "Reactivar"}
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {usuarios.map((u) => {
+              const rolActual = u.roles?.[0]?.codigo ?? "";
+              return (
+                <tr key={u.id} className="border-t align-top">
+                  <td className="p-3 font-medium">
+                    {u.nombre} {u.apellido}
+                  </td>
+                  <td className="p-3 text-muted-foreground">
+                    {u.email ?? "—"}
+                  </td>
+                  <td className="p-3 w-48">
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={rolesSeleccionados[u.id] ?? rolActual}
+                        onChange={(e) =>
+                          setRolesSeleccionados((r) => ({
+                            ...r,
+                            [u.id]: e.target.value,
+                          }))
+                        }
+                      >
+                        {Object.entries(ROLES_LABELS).map(
+                          ([codigo, etiqueta]) => (
+                            <option key={codigo} value={codigo}>
+                              {etiqueta}
+                            </option>
+                          ),
+                        )}
+                      </Select>
+                      {(rolesSeleccionados[u.id] ?? rolActual) !==
+                        rolActual && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={pendingRolId === u.id}
+                          onClick={() => handleCambiarRol(u.id, rolActual)}
+                        >
+                          {pendingRolId === u.id ? "..." : "Guardar"}
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                  <td className="p-3">
+                    <Badge
+                      variant={u.estado === "activo" ? "default" : "secondary"}
+                    >
+                      {u.estado}
+                    </Badge>
+                  </td>
+                  <td className="p-3 w-64">
+                    <Input
+                      placeholder="Motivo"
+                      value={motivos[u.id] ?? ""}
+                      onChange={(e) =>
+                        setMotivos((m) => ({ ...m, [u.id]: e.target.value }))
+                      }
+                    />
+                  </td>
+                  <td className="p-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={pendingId === u.id}
+                      onClick={() => handleCambiarEstado(u.id, u.estado)}
+                    >
+                      {u.estado === "activo" ? "Desactivar" : "Reactivar"}
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
