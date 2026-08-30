@@ -7,6 +7,7 @@ export type FiltrosCatalogo = {
   marcaId?: string;
   precioMin?: number;
   precioMax?: number;
+  especificaciones?: string;
 };
 
 export type ProductoCatalogo = {
@@ -14,6 +15,7 @@ export type ProductoCatalogo = {
   sku: string;
   nombre: string;
   descripcion: string | null;
+  especificaciones: string | null;
   precio: number;
   categoria: string | null;
   marca: string | null;
@@ -34,7 +36,7 @@ export async function getCatalogoPublico(
   let query = supabase
     .from("productos")
     .select(
-      "id, sku, nombre, descripcion, precio_b2c, precio_b2b, categoria_id, marca_id, categorias(nombre), marcas(nombre)",
+      "id, sku, nombre, descripcion, especificaciones, precio_b2c, precio_b2b, categoria_id, marca_id, categorias(nombre), marcas(nombre)",
     )
     .eq("estado", "publicado");
 
@@ -42,6 +44,8 @@ export async function getCatalogoPublico(
   if (filtros.marcaId) query = query.eq("marca_id", filtros.marcaId);
   if (filtros.precioMin !== undefined) query = query.gte("precio_b2c", filtros.precioMin);
   if (filtros.precioMax !== undefined) query = query.lte("precio_b2c", filtros.precioMax);
+  if (filtros.especificaciones)
+    query = query.ilike("especificaciones", `%${filtros.especificaciones}%`);
 
   const { data: productos, error } = await query.order("nombre");
 
@@ -71,6 +75,7 @@ export async function getCatalogoPublico(
       sku: string;
       nombre: string;
       descripcion: string | null;
+      especificaciones: string | null;
       precio_b2c: number;
       precio_b2b: number | null;
       categorias: { nombre: string } | null;
@@ -87,6 +92,7 @@ export async function getCatalogoPublico(
       sku: row.sku,
       nombre: row.nombre,
       descripcion: row.descripcion,
+      especificaciones: row.especificaciones,
       precio,
       categoria: row.categorias?.nombre ?? null,
       marca: row.marcas?.nombre ?? null,
