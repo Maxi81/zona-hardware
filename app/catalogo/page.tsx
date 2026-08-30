@@ -3,6 +3,8 @@ import { getCatalogoPublico } from "@/lib/catalogo/actions";
 import { getCategorias, getMarcas } from "@/lib/productos/actions";
 import { CatalogoFiltros } from "@/components/catalogo/catalogo-filtros";
 import { CatalogoGrid } from "@/components/catalogo/catalogo-grid";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 type SearchParams = Promise<{
   categoria_id?: string;
@@ -10,6 +12,7 @@ type SearchParams = Promise<{
   precio_min?: string;
   precio_max?: string;
   especificaciones?: string;
+  q?: string;
 }>;
 
 export default async function CatalogoPage({
@@ -27,30 +30,39 @@ export default async function CatalogoPage({
       precioMin: params.precio_min ? Number(params.precio_min) : undefined,
       precioMax: params.precio_max ? Number(params.precio_max) : undefined,
       especificaciones: params.especificaciones || undefined,
+      q: params.q || undefined,
     }),
     getCategorias(),
     getMarcas(),
   ]);
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <div>
-        <h1 className="text-2xl font-bold">Catálogo</h1>
-        <p className="text-sm text-muted-foreground">
-          Precios de venta al público.
-        </p>
-      </div>
-      <CatalogoFiltros
-        basePath="/catalogo"
-        categorias={categorias}
-        marcas={marcas}
-        categoriaId={params.categoria_id}
-        marcaId={params.marca_id}
-        precioMin={params.precio_min}
-        precioMax={params.precio_max}
-        especificaciones={params.especificaciones}
-      />
-      <CatalogoGrid productos={productos} />
+    <div className="flex min-h-svh flex-col">
+      <SiteHeader />
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
+        <div className="mb-6">
+          <h1 className="font-display text-2xl font-bold sm:text-3xl">Catálogo</h1>
+          <p className="text-sm text-muted-foreground">
+            Precios de venta al público · {productos.length} producto
+            {productos.length === 1 ? "" : "s"}
+          </p>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+          <CatalogoFiltros
+            basePath="/catalogo"
+            categorias={categorias}
+            marcas={marcas}
+            categoriaId={params.categoria_id}
+            marcaId={params.marca_id}
+            precioMin={params.precio_min}
+            precioMax={params.precio_max}
+            especificaciones={params.especificaciones}
+            q={params.q}
+          />
+          <CatalogoGrid productos={productos} />
+        </div>
+      </main>
+      <SiteFooter />
     </div>
   );
 }

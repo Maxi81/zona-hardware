@@ -8,6 +8,7 @@ export type FiltrosCatalogo = {
   precioMin?: number;
   precioMax?: number;
   especificaciones?: string;
+  q?: string;
 };
 
 export type ProductoCatalogo = {
@@ -46,6 +47,17 @@ export async function getCatalogoPublico(
   if (filtros.precioMax !== undefined) query = query.lte("precio_b2c", filtros.precioMax);
   if (filtros.especificaciones)
     query = query.ilike("especificaciones", `%${filtros.especificaciones}%`);
+
+  // Busqueda libre del header (HU-011 la extiende, no la reemplaza): busca
+  // por nombre, SKU o especificaciones, independiente del filtro puntual de
+  // especificaciones del panel lateral.
+  const q = filtros.q?.trim();
+  if (q) {
+    const term = q.replace(/[,()]/g, " ").trim();
+    query = query.or(
+      `nombre.ilike.%${term}%,sku.ilike.%${term}%,especificaciones.ilike.%${term}%`,
+    );
+  }
 
   const { data: productos, error } = await query.order("nombre");
 

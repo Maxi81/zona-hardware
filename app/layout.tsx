@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Inter, Rajdhani } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
@@ -9,14 +9,22 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Kit inicial de Next.js y Supabase",
-  description: "La forma más rápida de crear aplicaciones con Next.js y Supabase",
+  title: "ZonaHardware",
+  description:
+    "Catálogo, depósitos y ventas de ZonaHardware en un solo sistema, con precios diferenciados para clientes y revendedores.",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fontSans = Inter({
+  variable: "--font-sans",
   display: "swap",
   subsets: ["latin"],
+});
+
+const fontDisplay = Rajdhani({
+  variable: "--font-display",
+  display: "swap",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
 export default function RootLayout({
@@ -26,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${fontSans.variable} ${fontDisplay.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
