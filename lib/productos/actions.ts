@@ -27,6 +27,7 @@ export type ProductoAdmin = {
   sku: string;
   nombre: string;
   descripcion: string | null;
+  especificaciones: string | null;
   categoria_id: string;
   marca_id: string;
   precio_b2c: number;
@@ -128,7 +129,7 @@ export async function getProductosAdmin(): Promise<ProductoAdmin[]> {
   const { data, error } = await supabase
     .from("productos")
     .select(
-      "id, sku, nombre, descripcion, categoria_id, marca_id, precio_b2c, precio_b2b, estado, categorias(nombre), marcas(nombre)",
+      "id, sku, nombre, descripcion, especificaciones, categoria_id, marca_id, precio_b2c, precio_b2b, estado, categorias(nombre), marcas(nombre)",
     )
     .order("created_at", { ascending: false });
 
@@ -147,6 +148,8 @@ export async function crearProducto(formData: FormData): Promise<ActionResult> {
   const sku = String(formData.get("sku") ?? "").trim();
   const nombre = String(formData.get("nombre") ?? "").trim();
   const descripcion = String(formData.get("descripcion") ?? "").trim() || null;
+  const especificaciones =
+    String(formData.get("especificaciones") ?? "").trim() || null;
   const categoriaId = String(formData.get("categoria_id") ?? "").trim();
   const marcaId = String(formData.get("marca_id") ?? "").trim();
   const precioB2cRaw = String(formData.get("precio_b2c") ?? "").trim();
@@ -177,6 +180,7 @@ export async function crearProducto(formData: FormData): Promise<ActionResult> {
       sku,
       nombre,
       descripcion,
+      especificaciones,
       categoria_id: categoriaId,
       marca_id: marcaId,
       precio_b2c: precioB2c,

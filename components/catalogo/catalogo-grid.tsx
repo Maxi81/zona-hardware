@@ -30,6 +30,11 @@ export function CatalogoGrid({ productos }: { productos: ProductoCatalogo[] }) {
             {p.descripcion && (
               <p className="text-sm text-muted-foreground line-clamp-2">{p.descripcion}</p>
             )}
+            {p.especificaciones && (
+              <p className="text-xs text-muted-foreground line-clamp-2">
+                {p.especificaciones}
+              </p>
+            )}
             <p className="text-lg font-semibold">
               ${p.precio.toLocaleString("es-AR")}
             </p>

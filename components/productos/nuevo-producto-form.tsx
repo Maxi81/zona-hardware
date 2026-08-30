@@ -54,6 +54,14 @@ export function NuevoProductoForm({
               <Label htmlFor="descripcion">Descripción</Label>
               <Input id="descripcion" name="descripcion" placeholder="Opcional" />
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="especificaciones">Especificaciones</Label>
+              <Input
+                id="especificaciones"
+                name="especificaciones"
+                placeholder="Ej: 8GB GDDR6, 128-bit, PCIe 4.0 (opcional, se puede buscar en el catálogo)"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="categoria_id">Categoría</Label>

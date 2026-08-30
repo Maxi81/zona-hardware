@@ -12,6 +12,7 @@ export function CatalogoFiltros({
   marcaId,
   precioMin,
   precioMax,
+  especificaciones,
 }: {
   basePath: string;
   categorias: Categoria[];
@@ -20,6 +21,7 @@ export function CatalogoFiltros({
   marcaId?: string;
   precioMin?: string;
   precioMax?: string;
+  especificaciones?: string;
 }) {
   return (
     <form
@@ -73,8 +75,18 @@ export function CatalogoFiltros({
           className="w-28"
         />
       </div>
+      <div className="grid gap-2">
+        <Label htmlFor="especificaciones">Especificaciones</Label>
+        <Input
+          id="especificaciones"
+          name="especificaciones"
+          placeholder="Ej: GDDR6, 16GB, socket AM5"
+          defaultValue={especificaciones ?? ""}
+          className="w-56"
+        />
+      </div>
       <Button type="submit">Filtrar</Button>
-      {(categoriaId || marcaId || precioMin || precioMax) && (
+      {(categoriaId || marcaId || precioMin || precioMax || especificaciones) && (
         <a href={basePath} className="text-sm text-muted-foreground underline">
           Limpiar filtros
         </a>

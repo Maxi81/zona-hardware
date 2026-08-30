@@ -9,6 +9,7 @@ type SearchParams = Promise<{
   marca_id?: string;
   precio_min?: string;
   precio_max?: string;
+  especificaciones?: string;
 }>;
 
 export default async function CatalogoPage({
@@ -25,6 +26,7 @@ export default async function CatalogoPage({
       marcaId: params.marca_id || undefined,
       precioMin: params.precio_min ? Number(params.precio_min) : undefined,
       precioMax: params.precio_max ? Number(params.precio_max) : undefined,
+      especificaciones: params.especificaciones || undefined,
     }),
     getCategorias(),
     getMarcas(),
@@ -46,6 +48,7 @@ export default async function CatalogoPage({
         marcaId={params.marca_id}
         precioMin={params.precio_min}
         precioMax={params.precio_max}
+        especificaciones={params.especificaciones}
       />
       <CatalogoGrid productos={productos} />
     </div>
