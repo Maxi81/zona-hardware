@@ -11,6 +11,7 @@ import { IngresoForm } from "@/components/stock/ingreso-form";
 import { StockDepositoTable } from "@/components/stock/stock-deposito-table";
 import { StockConsolidadoTable } from "@/components/stock/stock-consolidado-table";
 import { MovimientosRecientesTable } from "@/components/stock/movimientos-recientes-table";
+import Link from "next/link";
 
 type SearchParams = Promise<{ deposito_id?: string }>;
 
@@ -50,6 +51,11 @@ export default async function DepositoPage({
 
       {depositoId && (
         <>
+          <p className="text-sm">
+            <Link href={`/deposito/transferencias?deposito_id=${depositoId}`} className="underline">
+              Transferencias entre depósitos →
+            </Link>
+          </p>
           <IngresoForm depositoId={depositoId} productos={productos} />
           <div>
             <h2 className="text-lg font-semibold mb-2">Stock en este depósito</h2>
