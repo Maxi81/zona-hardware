@@ -47,10 +47,19 @@ export async function getUsuariosAdmin(): Promise<UsuarioAdmin[]> {
     authUsers?.users.map((u) => [u.id, u.email ?? null]) ?? [],
   );
 
-  return (usuarios ?? []).map((u) => ({
-    ...u,
-    email: emailPorId.get(u.id) ?? null,
-  })) as unknown as UsuarioAdmin[];
+  return (usuarios ?? []).map((u) => {
+    const rolesRaw = (u as { roles: unknown }).roles;
+    const roles = Array.isArray(rolesRaw)
+      ? rolesRaw
+      : rolesRaw
+        ? [rolesRaw]
+        : [];
+    return {
+      ...u,
+      roles,
+      email: emailPorId.get(u.id) ?? null,
+    };
+  }) as unknown as UsuarioAdmin[];
 }
 
 // El cambio de estado en si pasa por la funcion SECURITY DEFINER
