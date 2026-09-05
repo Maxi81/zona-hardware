@@ -60,6 +60,36 @@
   }
 }
 
+
+  /* Panel interno unificado (05/09/2026): paleta SIEMPRE clara, azul/indigo
+     ("ZH Backoffice"), independiente del toggle claro/oscuro del sitio
+     publico. Redefine los mismos tokens shadcn que ya usan los componentes
+     compartidos (Card, Button, Input, Select, Badge, etc.) para que todo lo
+     que ya existia en /admin, /deposito y /ventas se vea consistente con el
+     nuevo shell (sidebar, dashboard) sin tocar esos componentes uno por uno. */
+  .admin-theme {
+    color-scheme: light;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 226 100% 97%;
+    --secondary-foreground: 244 55% 41%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 226 100% 97%;
+    --accent-foreground: 244 55% 41%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;
+  }
+
 @layer base {
   * {
     @apply border-border;

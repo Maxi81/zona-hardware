@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserProfile } from "@/lib/auth/actions";
 import { revalidatePath } from "next/cache";
+import { esRolInterno } from "@/lib/site/roles";
 
 export type SolicitudRevendedor = {
   id: string;
@@ -59,8 +60,11 @@ export async function solicitarAltaRevendedor(
 export async function getSolicitudesPendientes(): Promise<
   SolicitudRevendedor[]
 > {
+  // Lectura del panel unificado (05/09/2026): los 4 roles internos pueden
+  // VER las solicitudes pendientes; aprobar/rechazar sigue admin-only (sin
+  // cambios en aprobarSolicitud/rechazarSolicitud, mas abajo).
   const profile = await getCurrentUserProfile();
-  if (profile?.roles?.[0]?.codigo !== "administrador") return [];
+  if (!esRolInterno(profile?.roles?.[0]?.codigo)) return [];
 
   const admin = createAdminClient();
   const { data, error } = await admin

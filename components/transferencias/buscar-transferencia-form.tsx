@@ -22,7 +22,7 @@ export function BuscarTransferenciaForm({
 
   return (
     <form
-      action="/deposito/transferencias"
+      action="/admin/transferencias"
       method="get"
       className="flex flex-wrap items-end gap-4 rounded-md border p-4"
     >

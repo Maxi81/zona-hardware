@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserProfile } from "@/lib/auth/actions";
 import { revalidatePath } from "next/cache";
+import { esRolInterno } from "@/lib/site/roles";
 
 export type ActionResult = { error?: string; success?: boolean };
 
@@ -44,6 +45,14 @@ export type StockAdmin = {
   cantidad_disponible: number;
   depositos: { nombre: string } | null;
 };
+
+// Lectura del panel unificado (05/09/2026): los 4 roles internos pueden VER
+// el catalogo admin (incluye borradores) y el stock crudo; crear/publicar/
+// dar de baja productos y ajustar stock siguen admin-only (esAdministrador).
+async function esPersonalInterno(): Promise<boolean> {
+  const profile = await getCurrentUserProfile();
+  return esRolInterno(profile?.roles?.[0]?.codigo);
+}
 
 async function esAdministrador(): Promise<boolean> {
   const profile = await getCurrentUserProfile();
@@ -123,7 +132,7 @@ export async function crearMarca(formData: FormData): Promise<ActionResult> {
 }
 
 export async function getProductosAdmin(): Promise<ProductoAdmin[]> {
-  if (!(await esAdministrador())) return [];
+  if (!(await esPersonalInterno())) return [];
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -227,7 +236,7 @@ export async function cambiarEstadoProducto(
 }
 
 export async function getStockAdmin(): Promise<StockAdmin[]> {
-  if (!(await esAdministrador())) return [];
+  if (!(await esPersonalInterno())) return [];
 
   const supabase = await createClient();
   const { data, error } = await supabase

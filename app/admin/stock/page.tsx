@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/auth/guards";
+import { ROLES_INTERNOS_TODOS } from "@/lib/site/roles";
 import { getDepositos } from "@/lib/productos/actions";
 import {
   getProductosParaStock,
@@ -15,12 +16,12 @@ import Link from "next/link";
 
 type SearchParams = Promise<{ deposito_id?: string }>;
 
-export default async function DepositoPage({
+export default async function AdminStockPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  await requireRole(["encargado_deposito"]);
+  await requireRole([...ROLES_INTERNOS_TODOS]);
   const params = await searchParams;
   const depositoId = params.deposito_id;
 
@@ -40,8 +41,8 @@ export default async function DepositoPage({
   return (
     <div className="flex flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold">Depósitos y stock</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold text-slate-900">Depósitos y stock</h1>
+        <p className="text-sm text-slate-500">
           Elegí un depósito para ver su stock puntual, registrar ingresos y
           revisar sus últimos movimientos.
         </p>
@@ -52,24 +53,27 @@ export default async function DepositoPage({
       {depositoId && (
         <>
           <p className="text-sm">
-            <Link href={`/deposito/transferencias?deposito_id=${depositoId}`} className="underline">
+            <Link
+              href={`/admin/transferencias?deposito_id=${depositoId}`}
+              className="text-indigo-600 underline underline-offset-2"
+            >
               Transferencias entre depósitos →
             </Link>
           </p>
           <IngresoForm depositoId={depositoId} productos={productos} />
           <div>
-            <h2 className="text-lg font-semibold mb-2">Stock en este depósito</h2>
+            <h2 className="text-lg font-semibold mb-2 text-slate-900">Stock en este depósito</h2>
             <StockDepositoTable stock={stockDeposito} />
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Últimos movimientos</h2>
+            <h2 className="text-lg font-semibold mb-2 text-slate-900">Últimos movimientos</h2>
             <MovimientosRecientesTable movimientos={movimientos} />
           </div>
         </>
       )}
 
       <div>
-        <h2 className="text-lg font-semibold mb-2">Consolidado de toda la red</h2>
+        <h2 className="text-lg font-semibold mb-2 text-slate-900">Consolidado de toda la red</h2>
         <StockConsolidadoTable stock={consolidado} />
       </div>
     </div>

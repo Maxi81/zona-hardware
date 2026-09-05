@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/auth/guards";
+import { ROLES_INTERNOS_TODOS } from "@/lib/site/roles";
 import { getDepositos } from "@/lib/productos/actions";
 import { getProductosParaStock } from "@/lib/stock/actions";
 import {
@@ -16,12 +17,12 @@ import Link from "next/link";
 
 type SearchParams = Promise<{ deposito_id?: string; producto_id?: string }>;
 
-export default async function TransferenciasPage({
+export default async function AdminTransferenciasPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  await requireRole(["encargado_deposito"]);
+  await requireRole([...ROLES_INTERNOS_TODOS]);
   const params = await searchParams;
   const depositoId = params.deposito_id;
   const productoId = params.producto_id;
@@ -53,15 +54,18 @@ export default async function TransferenciasPage({
   return (
     <div className="flex flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold">Transferencias entre depósitos</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold text-slate-900">Transferencias entre depósitos</h1>
+        <p className="text-sm text-slate-500">
           Si este depósito se queda sin stock de un producto, buscá qué otro
           depósito de la red lo tiene y solicitale una transferencia. Las
           salidas de este depósito necesitan aprobación antes de despacharse.
         </p>
         {depositoId && (
           <p className="text-sm mt-1">
-            <Link href={`/deposito?deposito_id=${depositoId}`} className="underline">
+            <Link
+              href={`/admin/stock?deposito_id=${depositoId}`}
+              className="text-indigo-600 underline underline-offset-2"
+            >
               ← Volver a stock e ingresos de este depósito
             </Link>
           </p>
@@ -73,7 +77,7 @@ export default async function TransferenciasPage({
       {depositoId && (
         <>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Buscar y solicitar</h2>
+            <h2 className="text-lg font-semibold mb-2 text-slate-900">Buscar y solicitar</h2>
             <div className="flex flex-col gap-4">
               <BuscarTransferenciaForm
                 depositoId={depositoId}
@@ -92,26 +96,26 @@ export default async function TransferenciasPage({
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold mb-2">
+            <h2 className="text-lg font-semibold mb-2 text-slate-900">
               Pendientes de aprobación desde este depósito
             </h2>
             <PendientesAprobarTable transferencias={pendientesParaAprobar} />
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold mb-2">
+            <h2 className="text-lg font-semibold mb-2 text-slate-900">
               Aprobadas, listas para despachar
             </h2>
             <DespacharTable transferencias={aprobadasParaDespachar} />
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold mb-2">En tránsito hacia este depósito</h2>
+            <h2 className="text-lg font-semibold mb-2 text-slate-900">En tránsito hacia este depósito</h2>
             <RecibirTable transferencias={enTransitoParaRecibir} />
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold mb-2">Historial de este depósito</h2>
+            <h2 className="text-lg font-semibold mb-2 text-slate-900">Historial de este depósito</h2>
             <HistorialTable transferencias={transferencias} depositoId={depositoId} />
           </div>
         </>

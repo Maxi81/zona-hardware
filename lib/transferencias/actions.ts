@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserProfile } from "@/lib/auth/actions";
 import { revalidatePath } from "next/cache";
+import { esRolInterno } from "@/lib/site/roles";
 
 export type ActionResult = { error?: string; success?: boolean };
 
@@ -32,17 +33,26 @@ export type Transferencia = {
   destino: { nombre: string } | null;
 };
 
+// Escritura (solicitar/aprobar/rechazar/despachar/confirmar): sin cambios,
+// sigue siendo solo administrador y encargado de deposito.
 async function puedeGestionarTransferencias(): Promise<boolean> {
   const profile = await getCurrentUserProfile();
   const codigo = profile?.roles?.[0]?.codigo;
   return codigo === "administrador" || codigo === "encargado_deposito";
 }
 
+// Lectura del panel unificado (05/09/2026): los 4 roles internos pueden VER
+// el estado de la red y el historial de transferencias.
+async function puedeVerTransferencias(): Promise<boolean> {
+  const profile = await getCurrentUserProfile();
+  return esRolInterno(profile?.roles?.[0]?.codigo);
+}
+
 export async function buscarStockEnRed(
   productoId: string,
   excluirDepositoId: string,
 ): Promise<DepositoConStock[]> {
-  if (!productoId || !excluirDepositoId || !(await puedeGestionarTransferencias())) {
+  if (!productoId || !excluirDepositoId || !(await puedeVerTransferencias())) {
     return [];
   }
 
@@ -65,7 +75,7 @@ export async function buscarStockEnRed(
 export async function getTransferenciasDelDeposito(
   depositoId: string,
 ): Promise<Transferencia[]> {
-  if (!depositoId || !(await puedeGestionarTransferencias())) return [];
+  if (!depositoId || !(await puedeVerTransferencias())) return [];
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -114,7 +124,7 @@ export async function solicitarTransferencia(
 
   if (error) return { error: error.message };
 
-  revalidatePath("/deposito/transferencias");
+  revalidatePath("/admin/transferencias");
   return { success: true };
 }
 
@@ -140,7 +150,7 @@ export async function resolverTransferencia(
 
   if (error) return { error: error.message };
 
-  revalidatePath("/deposito/transferencias");
+  revalidatePath("/admin/transferencias");
   return { success: true };
 }
 
@@ -158,8 +168,8 @@ export async function despacharTransferencia(
 
   if (error) return { error: error.message };
 
-  revalidatePath("/deposito/transferencias");
-  revalidatePath("/deposito");
+  revalidatePath("/admin/transferencias");
+  revalidatePath("/admin/stock");
   return { success: true };
 }
 
@@ -190,7 +200,7 @@ export async function confirmarRecepcionTransferencia(
 
   if (error) return { error: error.message };
 
-  revalidatePath("/deposito/transferencias");
-  revalidatePath("/deposito");
+  revalidatePath("/admin/transferencias");
+  revalidatePath("/admin/stock");
   return { success: true };
 }
