@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserProfile } from "@/lib/auth/actions";
 import { revalidatePath } from "next/cache";
+import { esRolInterno } from "@/lib/site/roles";
 
 export type ActionResult = { error?: string; success?: boolean };
 
@@ -38,16 +39,25 @@ export type MovimientoStock = {
   tipo_movimiento_stock: { codigo: string; signo: number } | null;
 };
 
+// Escritura (registrar ingreso): sin cambios, sigue siendo solo
+// administrador y encargado de deposito.
 async function puedeGestionarStock(): Promise<boolean> {
   const profile = await getCurrentUserProfile();
   const codigo = profile?.roles?.[0]?.codigo;
   return codigo === "administrador" || codigo === "encargado_deposito";
 }
 
+// Lectura del panel unificado (05/09/2026): los 4 roles internos pueden VER
+// el stock por deposito, los productos para el selector y los movimientos.
+async function puedeVerStock(): Promise<boolean> {
+  const profile = await getCurrentUserProfile();
+  return esRolInterno(profile?.roles?.[0]?.codigo);
+}
+
 // Productos para los selects de las pantallas de deposito: incluye
 // borradores (el encargado necesita poder cargar stock antes de publicar).
 export async function getProductosParaStock(): Promise<ProductoLite[]> {
-  if (!(await puedeGestionarStock())) return [];
+  if (!(await puedeVerStock())) return [];
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -63,7 +73,7 @@ export async function getProductosParaStock(): Promise<ProductoLite[]> {
 }
 
 export async function getStockPorDeposito(depositoId: string): Promise<StockDeposito[]> {
-  if (!depositoId || !(await puedeGestionarStock())) return [];
+  if (!depositoId || !(await puedeVerStock())) return [];
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -96,7 +106,7 @@ export async function getMovimientosRecientes(
   depositoId: string,
   limite = 10,
 ): Promise<MovimientoStock[]> {
-  if (!depositoId || !(await puedeGestionarStock())) return [];
+  if (!depositoId || !(await puedeVerStock())) return [];
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -147,7 +157,7 @@ export async function registrarIngreso(formData: FormData): Promise<ActionResult
 
   if (error) return { error: error.message };
 
-  revalidatePath("/deposito");
+  revalidatePath("/admin/stock");
   revalidatePath("/admin/productos");
   revalidatePath("/catalogo");
   revalidatePath("/catalogo-mayorista");

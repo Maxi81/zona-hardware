@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserProfile } from "@/lib/auth/actions";
 import { revalidatePath } from "next/cache";
 import { ROLES_INTERNOS, type RolInterno } from "@/lib/usuarios-admin/roles";
+import { esRolInterno } from "@/lib/site/roles";
 
 export type UsuarioAdmin = {
   id: string;
@@ -23,11 +24,19 @@ async function esAdministrador(): Promise<boolean> {
   return profile?.roles?.[0]?.codigo === "administrador";
 }
 
+// Lectura del panel unificado (05/09/2026): los 4 roles internos pueden VER
+// la lista de usuarios; crear/cambiar rol/desactivar siguen admin-only
+// (esAdministrador, sin tocar).
+async function esPersonalInterno(): Promise<boolean> {
+  const profile = await getCurrentUserProfile();
+  return esRolInterno(profile?.roles?.[0]?.codigo);
+}
+
 // Lista todos los usuarios con su email (solo lo tiene auth.users, que no es
 // legible por RLS). Requiere el cliente con service role; por eso se valida
 // primero, con el cliente normal, que quien llama es un admin activo.
 export async function getUsuariosAdmin(): Promise<UsuarioAdmin[]> {
-  if (!(await esAdministrador())) return [];
+  if (!(await esPersonalInterno())) return [];
 
   const admin = createAdminClient();
 

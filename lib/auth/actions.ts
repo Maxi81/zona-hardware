@@ -84,9 +84,9 @@ export async function signIn(
 
   const destinations: Record<string, string> = {
     administrador: "/admin",
-    encargado_deposito: "/deposito",
-    vendedor: "/ventas",
-    gerente: "/gerencia",
+    encargado_deposito: "/admin",
+    vendedor: "/admin",
+    gerente: "/admin",
     cliente: "/catalogo",
     revendedor: "/catalogo-mayorista",
   };

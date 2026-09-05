@@ -17,9 +17,9 @@ export const ROL_LABELS: Record<string, string> = {
 export const ROL_HOME: Record<string, string> = {
   cliente: "/catalogo",
   revendedor: "/catalogo-mayorista",
-  vendedor: "/ventas",
-  encargado_deposito: "/deposito",
-  gerente: "/gerencia",
+  vendedor: "/admin",
+  encargado_deposito: "/admin",
+  gerente: "/admin",
   administrador: "/admin",
 };
 
@@ -34,4 +34,22 @@ export const ROL_DESCRIPCIONES: Record<string, string> = {
 
 export function catalogoPathParaRol(codigoRol: string | undefined): string {
   return codigoRol === "revendedor" ? "/catalogo-mayorista" : "/catalogo";
+}
+
+// Panel interno unificado (05/09/2026): administrador, encargado de
+// deposito, vendedor y gerente comparten un unico panel en /admin, con el
+// mismo menu completo (Dashboard, Catalogo, Stock, Transferencias,
+// Sucursales, Revendedores, Usuarios). Los permisos de ESCRITURA de cada
+// accion siguen siendo los que ya tenia cada una (la mayoria admin-only, o
+// admin + encargado_deposito para stock/transferencias) - esto solo
+// determina quien puede ENTRAR al panel y VER las secciones.
+export const ROLES_INTERNOS_TODOS = [
+  "administrador",
+  "encargado_deposito",
+  "vendedor",
+  "gerente",
+] as const;
+
+export function esRolInterno(codigo: string | undefined | null): boolean {
+  return !!codigo && (ROLES_INTERNOS_TODOS as readonly string[]).includes(codigo);
 }

@@ -1,9 +1,10 @@
 import { requireRole } from "@/lib/auth/guards";
+import { ROLES_INTERNOS_TODOS } from "@/lib/site/roles";
 import { getSolicitudesPendientes } from "@/lib/revendedores/actions";
 import { SolicitudesPendientesTable } from "@/components/revendedores/solicitudes-pendientes-table";
 
 export default async function AdminRevendedoresPage() {
-  await requireRole(["administrador"]);
+  await requireRole([...ROLES_INTERNOS_TODOS]);
   const solicitudes = await getSolicitudesPendientes();
 
   return (

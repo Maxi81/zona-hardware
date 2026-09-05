@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/auth/guards";
+import { ROLES_INTERNOS_TODOS } from "@/lib/site/roles";
 import {
   getCategorias,
   getMarcas,
@@ -12,7 +13,7 @@ import { ProductosTable } from "@/components/productos/productos-table";
 import { StockForm } from "@/components/productos/stock-form";
 
 export default async function ProductosPage() {
-  await requireRole(["administrador"]);
+  await requireRole([...ROLES_INTERNOS_TODOS]);
 
   const [categorias, marcas, productos, depositos, stock] = await Promise.all([
     getCategorias(),

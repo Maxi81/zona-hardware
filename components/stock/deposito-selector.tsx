@@ -20,7 +20,7 @@ export function DepositoSelector({
   }
 
   return (
-    <form action="/deposito" method="get" className="flex flex-wrap items-end gap-4">
+    <form action="/admin/stock" method="get" className="flex flex-wrap items-end gap-4">
       <div className="grid gap-2">
         <Label htmlFor="deposito_id">Depósito</Label>
         <Select id="deposito_id" name="deposito_id" defaultValue={depositoId ?? ""} required>

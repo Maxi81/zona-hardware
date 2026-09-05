@@ -1,10 +1,11 @@
 import { requireRole } from "@/lib/auth/guards";
+import { ROLES_INTERNOS_TODOS } from "@/lib/site/roles";
 import { getUsuariosAdmin } from "@/lib/usuarios-admin/actions";
 import { UsuariosTable } from "@/components/usuarios-admin/usuarios-table";
 import { NuevoUsuarioInternoForm } from "@/components/usuarios-admin/nuevo-usuario-interno-form";
 
 export default async function AdminUsuariosPage() {
-  await requireRole(["administrador"]);
+  await requireRole([...ROLES_INTERNOS_TODOS]);
   const usuarios = await getUsuariosAdmin();
 
   return (
