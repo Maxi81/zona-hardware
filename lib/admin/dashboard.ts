@@ -8,7 +8,7 @@ import { esRolInterno } from "@/lib/site/roles";
 export type DashboardMetrics = {
   stockTotalUnidades: number;
   productosPublicados: number;
-  transferenciasEnCurso: number;
+  transferenciasHoy: number;
   movimientosHoy: number;
   usuariosActivos: number;
   solicitudesRevendedorPendientes: number;
@@ -17,7 +17,7 @@ export type DashboardMetrics = {
 const METRICS_VACIAS: DashboardMetrics = {
   stockTotalUnidades: 0,
   productosPublicados: 0,
-  transferenciasEnCurso: 0,
+  transferenciasHoy: 0,
   movimientosHoy: 0,
   usuariosActivos: 0,
   solicitudesRevendedorPendientes: 0,
@@ -27,6 +27,11 @@ const METRICS_VACIAS: DashboardMetrics = {
 // modulos que existen de verdad hoy (Catalogo, Stock, Transferencias,
 // Identidad/Revendedores) - nada de ingresos/egresos ni ordenes de compra,
 // porque Ventas y Compras todavia no estan construidos.
+//
+// (10/09/2026) transferenciasEnCurso paso a transferenciasHoy: desde que las
+// transferencias son atomicas (sin flujo de aprobacion, ver migracion
+// 20260910000000_movimientos_stock_unificado.sql) ya no existe el estado
+// 'pendiente_aprobacion'/'en_transito', asi que ese conteo siempre daba 0.
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   const profile = await getCurrentUserProfile();
   if (!esRolInterno(profile?.roles?.[0]?.codigo)) return METRICS_VACIAS;
@@ -43,7 +48,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
       supabase
         .from("transferencias_stock")
         .select("id", { count: "exact", head: true })
-        .in("estado", ["pendiente_aprobacion", "en_transito"]),
+        .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
       supabase
         .from("movimientos_stock")
         .select("id", { count: "exact", head: true })
@@ -75,7 +80,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   return {
     stockTotalUnidades,
     productosPublicados: productosRes.count ?? 0,
-    transferenciasEnCurso: transferenciasRes.count ?? 0,
+    transferenciasHoy: transferenciasRes.count ?? 0,
     movimientosHoy: movimientosRes.count ?? 0,
     usuariosActivos,
     solicitudesRevendedorPendientes: solicitudesRes.count ?? 0,

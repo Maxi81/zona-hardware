@@ -6,8 +6,7 @@ import { useState } from "react";
 import {
   LayoutDashboard,
   PackageSearch,
-  Boxes,
-  ArrowLeftRight,
+  ArrowUpDown,
   Store,
   UserPlus,
   Users,
@@ -25,8 +24,7 @@ const NAV_ITEMS: {
 }[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/productos", label: "Catálogo", icon: PackageSearch },
-  { href: "/admin/stock", label: "Stock", icon: Boxes },
-  { href: "/admin/transferencias", label: "Transferencias", icon: ArrowLeftRight },
+  { href: "/admin/movimientos", label: "Movimientos de Stock", icon: ArrowUpDown },
   { href: "/admin/sucursales", label: "Sucursales", icon: Store },
   { href: "/admin/revendedores", label: "Revendedores", icon: UserPlus },
   { href: "/admin/usuarios", label: "Usuarios", icon: Users },

@@ -79,9 +79,9 @@ export default async function AdminPage() {
           color="emerald"
         />
         <StatTile
-          label="Transferencias en curso"
-          value={metrics.transferenciasEnCurso}
-          hint="Pendientes de aprobación o en tránsito"
+          label="Transferencias hoy"
+          value={metrics.transferenciasHoy}
+          hint="Transferencias entre depósitos del día"
           icon={ArrowLeftRight}
           color="sky"
         />
