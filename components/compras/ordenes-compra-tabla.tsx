@@ -3,12 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  emitirOrdenCompra,
-  registrarRemito,
-  formatearNumeroOC,
-  type OrdenCompra,
-} from "@/lib/compras/actions";
+import { emitirOrdenCompra, registrarRemito, type OrdenCompra } from "@/lib/compras/actions";
+import { formatearNumeroOC } from "@/lib/compras/format";
 
 const ESTADO_INFO: Record<string, { label: string; className: string }> = {
   borrador: { label: "Borrador", className: "bg-slate-100 text-slate-700" },

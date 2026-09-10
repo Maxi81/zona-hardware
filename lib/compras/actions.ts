@@ -69,10 +69,6 @@ function revalidarCompras() {
   revalidatePath("/admin");
 }
 
-export function formatearNumeroOC(numero: number): string {
-  return `OC-${String(numero).padStart(4, "0")}`;
-}
-
 export async function getOrdenesCompra(
   filtros: FiltrosOrdenesCompra = {},
   limite = 100,
