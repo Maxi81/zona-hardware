@@ -12,6 +12,8 @@ import {
   Users,
   Menu,
   X,
+  Building2,
+  ShoppingCart,
 } from "lucide-react";
 import { LogoutButton } from "@/components/logout-button";
 import { ROL_LABELS } from "@/lib/site/roles";
@@ -25,6 +27,8 @@ const NAV_ITEMS: {
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/productos", label: "Catálogo", icon: PackageSearch },
   { href: "/admin/movimientos", label: "Movimientos de Stock", icon: ArrowUpDown },
+  { href: "/admin/proveedores", label: "Proveedores", icon: Building2 },
+  { href: "/admin/compras", label: "Compras", icon: ShoppingCart },
   { href: "/admin/sucursales", label: "Sucursales", icon: Store },
   { href: "/admin/revendedores", label: "Revendedores", icon: UserPlus },
   { href: "/admin/usuarios", label: "Usuarios", icon: Users },

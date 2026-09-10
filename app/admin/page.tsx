@@ -8,6 +8,7 @@ import {
   Activity,
   Users,
   UserPlus,
+  ClipboardList,
 } from "lucide-react";
 
 const TILE_STYLES = {
@@ -17,6 +18,7 @@ const TILE_STYLES = {
   sky: { bg: "bg-sky-50", icon: "text-sky-600" },
   violet: { bg: "bg-violet-50", icon: "text-violet-600" },
   rose: { bg: "bg-rose-50", icon: "text-rose-600" },
+  teal: { bg: "bg-teal-50", icon: "text-teal-600" },
 } as const;
 
 function StatTile({
@@ -105,6 +107,13 @@ export default async function AdminPage() {
           hint="Pendientes de revisión"
           icon={UserPlus}
           color="rose"
+        />
+        <StatTile
+          label="Órdenes de compra pendientes"
+          value={metrics.ordenesCompraPendientes}
+          hint="En borrador o emitidas, sin remito recibido"
+          icon={ClipboardList}
+          color="teal"
         />
       </div>
     </div>
