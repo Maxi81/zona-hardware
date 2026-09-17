@@ -170,6 +170,25 @@ export async function registrarRemito(ordenCompraId: string): Promise<ActionResu
   return { success: true };
 }
 
+export type ComprobantePendiente = {
+  id: string;
+  tipo: "factura" | "nota_debito" | "nota_credito";
+  numero: string;
+  fecha_emision: string;
+  monto_total: number;
+  orden_compra_id: string | null;
+  orden_compra_numero: number | null;
+};
+
+export type MovimientoCuentaCorriente = {
+  fecha: string;
+  tipo: string;
+  numero: string;
+  monto_debe: number;
+  monto_haber: number;
+  detalle: string;
+};
+
 export async function getDeudaProveedores(): Promise<DeudaProveedor[]> {
   if (!(await esAdministrador())) return [];
 
@@ -183,20 +202,91 @@ export async function getDeudaProveedores(): Promise<DeudaProveedor[]> {
   return (data ?? []) as DeudaProveedor[];
 }
 
-export async function registrarPagoProveedores(
-  proveedorIds: string[],
-): Promise<ActionResult> {
+export async function getComprobantesPendientes(proveedorId: string): Promise<ComprobantePendiente[]> {
+  if (!(await esAdministrador())) return [];
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("listar_comprobantes_pendientes", {
+    p_proveedor_id: proveedorId,
+  });
+
+  if (error) {
+    console.error("Error al listar comprobantes pendientes:", error.message);
+    return [];
+  }
+  return (data ?? []) as ComprobantePendiente[];
+}
+
+export async function getCuentaCorriente(proveedorId: string): Promise<MovimientoCuentaCorriente[]> {
+  if (!(await esAdministrador())) return [];
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("listar_cuenta_corriente_proveedor", {
+    p_proveedor_id: proveedorId,
+  });
+
+  if (error) {
+    console.error("Error al listar cuenta corriente:", error.message);
+    return [];
+  }
+  return (data ?? []) as MovimientoCuentaCorriente[];
+}
+
+export async function crearComprobante(formData: FormData): Promise<ActionResult> {
   if (!(await esAdministrador())) {
-    return { error: "Solo un administrador puede registrar pagos a proveedores" };
+    return { error: "Solo un administrador puede registrar comprobantes" };
   }
 
-  if (!proveedorIds.length) {
-    return { error: "Elegí al menos un proveedor para pagar" };
+  const proveedorId = String(formData.get("proveedor_id") ?? "").trim();
+  const tipo = String(formData.get("tipo") ?? "").trim();
+  const numero = String(formData.get("numero") ?? "").trim();
+  const fecha = String(formData.get("fecha_emision") ?? "").trim();
+  const montoRaw = String(formData.get("monto_total") ?? "").trim();
+  const ordenCompraId = String(formData.get("orden_compra_id") ?? "").trim() || null;
+
+  if (!proveedorId || !tipo || !numero || !fecha || !montoRaw) {
+    return { error: "Todos los campos son obligatorios" };
+  }
+
+  const monto = Number(montoRaw);
+  if (Number.isNaN(monto) || monto <= 0) {
+    return { error: "El monto debe ser un numero mayor a 0" };
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("registrar_pago_proveedores", {
-    p_proveedor_ids: proveedorIds,
+  const { error } = await supabase.rpc("registrar_comprobante_proveedor", {
+    p_proveedor_id: proveedorId,
+    p_tipo: tipo,
+    p_numero: numero,
+    p_fecha_emision: fecha,
+    p_monto_total: monto,
+    p_orden_compra_id: ordenCompraId,
+  });
+
+  if (error) return { error: error.message };
+
+  revalidarCompras();
+  return { success: true };
+}
+
+export async function crearOrdenPago(
+  proveedorId: string,
+  comprobantesIds: string[],
+  notas: string | null = null,
+): Promise<ActionResult> {
+  if (!(await esAdministrador())) {
+    return { error: "Solo un administrador puede crear ordenes de pago" };
+  }
+
+  if (!comprobantesIds.length) {
+    return { error: "Elegi al menos un comprobante para pagar" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("crear_orden_pago", {
+    p_proveedor_id: proveedorId,
+    p_comprobantes_ids: comprobantesIds,
+    p_notas: notas,
   });
 
   if (error) return { error: error.message };

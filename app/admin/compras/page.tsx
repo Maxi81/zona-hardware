@@ -9,6 +9,7 @@ import {
   type FiltrosOrdenesCompra,
 } from "@/lib/compras/actions";
 import { NuevaOrdenCompraBoton } from "@/components/compras/nueva-orden-compra-modal";
+import { NuevoComprobanteBoton } from "@/components/compras/nuevo-comprobante-modal";
 import { ComprasFiltros } from "@/components/compras/compras-filtros";
 import { OrdenesCompraTabla } from "@/components/compras/ordenes-compra-tabla";
 import { PagosProveedoresPanel } from "@/components/compras/pagos-proveedores-panel";
@@ -52,16 +53,21 @@ export default async function AdminComprasPage({
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Compras y proveedores</h1>
           <p className="text-sm text-slate-500">
-            Órdenes de compra a proveedores, recepción de remitos y pagos.
+            rdenes de compra a proveedores, recepcin de remitos y pagos.
           </p>
         </div>
-        {esAdministrador && (
-          <NuevaOrdenCompraBoton
-            proveedores={proveedores}
-            depositos={depositos}
-            productos={productos}
-          />
-        )}
+        <div className="flex gap-2">
+          {esAdministrador && tab === "pagos" && (
+            <NuevoComprobanteBoton proveedores={proveedores} ordenes={ordenes} />
+          )}
+          {esAdministrador && (
+            <NuevaOrdenCompraBoton
+              proveedores={proveedores}
+              depositos={depositos}
+              productos={productos}
+            />
+          )}
+        </div>
       </div>
 
       {esAdministrador && (
